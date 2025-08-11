@@ -1,0 +1,30 @@
+name: alipan_auto_sign
+
+on:
+  schedule:
+    - cron: '11 23 * * *'  # 每天23:11 UTC运行（根据需要调整时区）
+  workflow_dispatch:      # 支持手动触发
+
+jobs:
+  build_and_run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Go 1.21.3
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21.3'
+
+      - name: Build and run autoSign
+        env:
+          REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          QL_PATH: ${{ secrets.QL_PATH }}
+        run: |
+          go build -o autoSign &&
+          chmod +x ./autoSign &&
+          ./autoSign
